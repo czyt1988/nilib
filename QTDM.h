@@ -226,6 +226,7 @@ public:
     /// \return 信息
     ///
     QString getGroupPropertyByName(DDCChannelGroupHandle grouphandle,const char* propertyName);
+    static QString getGroupPropertyByName_s(DDCChannelGroupHandle grouphandle,const char* propertyName);
     ///
     /// \brief 获取组的属性
     /// \param grouphandle 组的句柄
@@ -256,6 +257,7 @@ public:
     /// \return
     ///
     QString getChannelStringPropertyByName(DDCChannelHandle channelHandle,const char* propertyName);
+    static QString getChannelStringPropertyByName_s(DDCChannelHandle channelHandle,const char* propertyName);
     ///
     /// \brief 获取通道的所有默认属性
     /// \param channelHandle 通道句柄
@@ -352,6 +354,7 @@ public:
     /// \return
     ///
     DDCDataType getDataType(DDCChannelHandle channelHandle);
+    static DDCDataType getDataType_s(DDCChannelHandle channelHandle);
 	QString getDataTypeToString(DDCChannelHandle channelHandle);
 public:
 	DDCFileHandle setInStandardItem(tdmFileStruct fileStruct
@@ -382,7 +385,7 @@ public:
 
 	static QString dataTypeToString(const DDCDataType dataType);
 public:
-	static DDCDataType getDataType_s(DDCChannelHandle channelHandle);
+
 	static unsigned __int64 getChannelDataNums_s(DDCChannelHandle channelHandle);
 signals:
     

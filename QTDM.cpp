@@ -241,6 +241,25 @@ QString QTDM::getGroupPropertyByName(DDCChannelGroupHandle grouphandle,const cha
     return str;
 }
 
+QString QTDM::getGroupPropertyByName_s(DDCChannelGroupHandle grouphandle, const char* propertyName)
+{
+    unsigned int length(0);
+
+    //获取文件属性
+    int errCode = DDC_GetChannelGroupStringPropertyLength (grouphandle
+        , propertyName
+        , &length);
+    char* property = nullptr;
+    length = (8)*(length+1);
+    property = new char[length];
+    memset(property,0,sizeof(char)*length);
+    errCode = DDC_GetChannelGroupProperty (grouphandle, propertyName, property, length);
+    QString str = QString::fromLocal8Bit(property);
+    if(property)
+        delete[] property;
+    return str;
+}
+
 QMap<char*,QString> QTDM::getGroupPropertys(DDCChannelGroupHandle grouphandle)
 {
     QMap<char*,QString> groupPropertys;
@@ -351,6 +370,22 @@ QString QTDM::getChannelStringPropertyByName(DDCChannelHandle channelHandle,cons
 
     if(errCode < 0)
         remember_err_code(errCode);
+    QString str = QString::fromLocal8Bit(property);
+    if(property)
+        delete[] property;
+    return str;
+}
+
+QString QTDM::getChannelStringPropertyByName_s(DDCChannelHandle channelHandle, const char* propertyName)
+{
+    unsigned int length(0);
+    //获取文件属性 - DDC_FILE_NAME
+    int errCode = DDC_GetChannelStringPropertyLength (channelHandle, propertyName, &length);
+    char* property = nullptr;
+    length = (8)*(length+1);
+    property = new char[length];
+    memset(property,0,sizeof(char)*length);
+    errCode = DDC_GetChannelProperty (channelHandle, propertyName, property, length);
     QString str = QString::fromLocal8Bit(property);
     if(property)
         delete[] property;
