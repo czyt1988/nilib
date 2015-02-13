@@ -299,7 +299,7 @@ public:
 	{
 		QVector<QVariant> datas;
 		if(DDC_NoError == getChannelDataValues_s(channelHandle,firstIndex,length,datas))
-            return czy::QArrayEx::VectorVariant2VectorType<T>(datas);
+            return czy::QArray::vectorVariant2vectorType<T>(datas);
 		return QVector<T>();
 	}
 		

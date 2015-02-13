@@ -906,19 +906,19 @@ QVector<QVariant> QTDM::getChannelDataValues(DDCChannelHandle channelHandle,size
     switch(type)
     {
     case DDCDataType::DDC_Float:
-        return czy::QArrayEx::VectorType2VectorVariant(getChannelFloatDataValues(channelHandle,firstIndex,length));
+        return czy::QArray::vectorType2vectorVariant(getChannelFloatDataValues(channelHandle,firstIndex,length));
     case DDCDataType::DDC_Double:
-        return czy::QArrayEx::VectorType2VectorVariant(getChannelDoubleDataValues(channelHandle,firstIndex,length));
+        return czy::QArray::vectorType2vectorVariant(getChannelDoubleDataValues(channelHandle,firstIndex,length));
     case DDCDataType::DDC_UInt8:
-        return czy::QArrayEx::VectorType2VectorVariant(getChannelUCharDataValues(channelHandle,firstIndex,length));
+        return czy::QArray::vectorType2vectorVariant(getChannelUCharDataValues(channelHandle,firstIndex,length));
     case DDCDataType::DDC_Int16:
-        return czy::QArrayEx::VectorType2VectorVariant(getChannelShortDataValues(channelHandle,firstIndex,length));
+        return czy::QArray::vectorType2vectorVariant(getChannelShortDataValues(channelHandle,firstIndex,length));
     case DDCDataType::DDC_Int32:
-        return czy::QArrayEx::VectorType2VectorVariant(getChannelLongDataValues(channelHandle,firstIndex,length));
+        return czy::QArray::vectorType2vectorVariant(getChannelLongDataValues(channelHandle,firstIndex,length));
     case DDCDataType::DDC_String:
-        return czy::QArrayEx::VectorType2VectorVariant(getChannelStringDataValues(channelHandle,firstIndex,length));
+        return czy::QArray::vectorType2vectorVariant(getChannelStringDataValues(channelHandle,firstIndex,length));
     case DDCDataType::DDC_Timestamp:
-        return czy::QArrayEx::VectorType2VectorVariant(getChannelDateTimeDataValues(channelHandle,firstIndex,length));
+        return czy::QArray::vectorType2vectorVariant(getChannelDateTimeDataValues(channelHandle,firstIndex,length));
     }
     return QVector<QVariant>();
 }
@@ -1065,49 +1065,49 @@ int QTDM::getChannelDataValues_s(DDCChannelHandle channelHandle,size_t firstInde
 		{
 			QVector<float> dataF;
 			r = getChannelFloatDataValues_s(channelHandle,firstIndex,length,dataF);
-			outputDatas = czy::QArrayEx::VectorType2VectorVariant(dataF);
+            outputDatas = czy::QArray::vectorType2vectorVariant(dataF);
 		}
 		break;
 	case DDCDataType::DDC_Double:
 		{
 			QVector<double> dataD;
 			r = getChannelDoubleDataValues_s(channelHandle,firstIndex,length,dataD);
-			outputDatas = czy::QArrayEx::VectorType2VectorVariant(dataD);
+            outputDatas = czy::QArray::vectorType2vectorVariant(dataD);
 		}	
 		break;
 	case DDCDataType::DDC_UInt8:
 		{
 			QVector<unsigned char> dataU8;
 			r = getChannelUCharDataValues_s(channelHandle,firstIndex,length,dataU8);
-			outputDatas =  czy::QArrayEx::VectorType2VectorVariant(dataU8);
+            outputDatas =  czy::QArray::vectorType2vectorVariant(dataU8);
 		}
 		break;
 	case DDCDataType::DDC_Int16:
 		{
 			QVector<short> dataI16;
 			r = getChannelShortDataValues_s(channelHandle,firstIndex,length,dataI16);
-			outputDatas = czy::QArrayEx::VectorType2VectorVariant(dataI16);
+            outputDatas = czy::QArray::vectorType2vectorVariant(dataI16);
 		}
 		break;
 	case DDCDataType::DDC_Int32:
 		{
 			QVector<long> dataI32;
 			r = getChannelLongDataValues_s(channelHandle,firstIndex,length,dataI32);
-			outputDatas =  czy::QArrayEx::VectorType2VectorVariant(dataI32);
+            outputDatas =  czy::QArray::vectorType2vectorVariant(dataI32);
 		}
 		break;
 	case DDCDataType::DDC_String:
 		{
 			QVector<QString> dataS;
 			r = getChannelStringDataValues_s(channelHandle,firstIndex,length,dataS);
-			outputDatas = czy::QArrayEx::VectorType2VectorVariant(dataS);
+            outputDatas = czy::QArray::vectorType2vectorVariant(dataS);
 		}
 		break;
 	case DDCDataType::DDC_Timestamp:
 		{
 			QVector<QDateTime> dataT;
 			r = getChannelDateTimeDataValues_s(channelHandle,firstIndex,length,dataT);
-			outputDatas = czy::QArrayEx::VectorType2VectorVariant(dataT);
+            outputDatas = czy::QArray::vectorType2vectorVariant(dataT);
 		}
 		break;
 	default:
