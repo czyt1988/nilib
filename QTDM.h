@@ -19,10 +19,10 @@
 #include <QDateTime>
 #include <qstandarditemmodel.h>
 #include <czyQArrayEx.h>
-#define TREE_ITEM_ROLE_DDC_Handle Qt::UserRole + 90
-#define TREE_ITEM_ROLE_DDC_TYPE Qt::UserRole + 95 //用于区分是组还是通道DDC_TYPE_GROUP,DDC_TYPE_CHANNEL
-#define TREE_ITEM_ROLE_DDC_DESCRIPTION Qt::UserRole + 100
-#define TREE_ITEM_ROLE_DDC_DATA_STRUCT_TYPE Qt::UserRole + 101//标定数据的结构,DataTypeMark,等同DDCDataType
+#define TREE_ITEM_ROLE_DDC_Handle Qt::UserRole + 2290//用于存放句柄
+#define TREE_ITEM_ROLE_DDC_TYPE Qt::UserRole + 2295 //用于区分是组还是通道DDC_TYPE_GROUP,DDC_TYPE_CHANNEL
+#define TREE_ITEM_ROLE_DDC_DESCRIPTION Qt::UserRole + 2200//用于存放描述
+#define TREE_ITEM_ROLE_DDC_DATA_STRUCT_TYPE Qt::UserRole + 2201//标定数据的结构,DataTypeMark,等同DDCDataType
 
 #define DDC_MY_TYPE_NO -1
 #define DDC_MY_TYPE_FILE 0
@@ -150,7 +150,7 @@ public:
 			closeFile();
 		m_openFile = file;
 	}
-	DDCFileHandle getFileHandle()
+    DDCFileHandle getFileHandle() const
 	{
 		return m_openFile;
 	}
@@ -176,7 +176,7 @@ public:
     /// \brief 判断文件是否打开
     /// \return
     ///
-    bool isFileOPen()
+    bool isFileOPen() const
     {
         return (m_openFile != 0);
     }
@@ -192,11 +192,12 @@ public:
     /// \return 返回属性内容
     /// \see GetFilePropertys
     QString getFilePropertyByName(DDCFileHandle file,const char* propertyName);
-	QString getFileProperty_Name();
+    QString getFileProperty_Name();
 	QString getFileProperty_Description();
 	QString getFileProperty_Title();
 	QString getFileProperty_Author();
 	static bool getFilePropertyByName_s(DDCFileHandle file,const char* propertyName,QString& out_res);
+
     ///
     /// \brief 获取文件属性内容
     /// \param file 文件句柄
@@ -209,6 +210,7 @@ public:
     /// \return
     ///
     unsigned int getGroupNums();
+    static unsigned int getGroupNums_s(DDCFileHandle file);
     ///
     /// \brief 获取所有组的句柄
 	/// 
@@ -217,7 +219,7 @@ public:
     /// \return 获取所有的组句柄
     /// \see tdm_group_struct
     QList<DDCChannelGroupHandle> getGroups();
-
+    static QList<DDCChannelGroupHandle> getGroups_s(DDCFileHandle file);
 
     ///
     /// \brief 根据属性名获取组的信息

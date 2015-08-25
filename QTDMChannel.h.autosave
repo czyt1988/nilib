@@ -1,0 +1,29 @@
+﻿#ifndef QTDMCHANNEL_H
+#define QTDMCHANNEL_H
+#include <nilibddc.h>
+#include <QString>
+
+class QTDMChannel
+{
+public:
+    QTDMChannel();
+    QTDMChannel(DDCChannelHandle handle);
+    DDCDataType getDataType() const;
+    ///{@ 数据属性操作
+    QString getName() const;
+    QString getDescription() const;
+    QString getUnit() const;
+    QString getDataTypeString() const;
+    ///}@
+    
+    /// {@
+    
+    /// }@
+    static QString dataTypeToString(const DDCDataType dataType);
+private:
+    QString getChannelStringPropertyByName(const char* propertyName) const;
+private:
+    DDCChannelHandle m_channel;
+};
+
+#endif // QTDMCHANNEL_H

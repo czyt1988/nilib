@@ -9,7 +9,7 @@ public:
 	///
 	/// \brief设置组句柄给模型
 	/// \param group_handle
-	void setChannelGroupHandle(DDCChannelGroupHandle group_handle){
+	void setGroupHandle(DDCChannelGroupHandle group_handle){
 		this->m_groupHandle = group_handle;
 		m_channelHandles.clear();
 		QTDM::getChannels_s(group_handle,m_channelHandles);

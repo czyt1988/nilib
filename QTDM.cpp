@@ -49,7 +49,6 @@ bool QTDM::loadTdm(const QString& filePath, bool readOnly)
         DDC_CloseFile(m_openFile);
     m_openFile = 0;
     QString path = QDir::toNativeSeparators(filePath);
-	qDebug()<<"tdmFile:"<<path;
     int errCode = DDC_OpenFileEx (path.toLocal8Bit().constData(), "TDM",readOnly, &m_openFile);
     remember_err_code(errCode);
     if(errCode < 0)
@@ -71,7 +70,6 @@ bool QTDM::loadTdms(const QString& filePath, bool readOnly)
         DDC_CloseFile(m_openFile);
     m_openFile = 0;
     QString path = QDir::toNativeSeparators(filePath);
-	qDebug()<<"tdmsFile:"<<path;
     int errCode = DDC_OpenFileEx (path.toLocal8Bit().constData(), "TDMS",readOnly, &m_openFile);
     remember_err_code(errCode);
     if(errCode < 0)
@@ -121,7 +119,6 @@ QString QTDM::getFilePropertyByName(DDCFileHandle file , const char* propertyNam
     length = (8)*(length + 1);//让它长度有足够
     property = new char[length];
     memset(property,0,sizeof(char)*length);
-
     errCode = DDC_GetFileProperty (file, propertyName, property, length);
     if(errCode < 0)
         remember_err_code(errCode);
@@ -151,11 +148,7 @@ bool QTDM::getFilePropertyByName_s(DDCFileHandle file,const char* propertyName,Q
 	errCode = DDC_GetFileProperty (file, propertyName, property.get(), length);
 	if(errCode < 0)
 		return false;
-
 	out_res = QString::fromLocal8Bit(property.get());
-
-// 	if(property)
-// 		delete[] property;
 	return true;
 }
 
@@ -198,6 +191,13 @@ unsigned int QTDM::getGroupNums()
     return groupNum;
 }
 
+unsigned int QTDM::getGroupNums_s(DDCFileHandle file)
+{
+    unsigned int groupNum = 0;
+    DDC_GetNumChannelGroups(file, &groupNum);
+    return groupNum;
+}
+
 QList<DDCChannelGroupHandle> QTDM::getGroups()
 {
     QList<DDCChannelGroupHandle> groups;
@@ -210,6 +210,21 @@ QList<DDCChannelGroupHandle> QTDM::getGroups()
     remember_err_code(DDC_GetChannelGroups (m_openFile, pGroupHandles.data(), groupNums));
     //转移
     for(unsigned int i=0;i<groupNums;++i){
+        groups.append(pGroupHandles[i]);
+    }
+    return groups;
+}
+
+QList<DDCChannelGroupHandle> QTDM::getGroups_s(DDCFileHandle file)
+{
+    QList<DDCChannelGroupHandle> groups;
+    unsigned int groupNums = QTDM::getGroupNums_s(file);
+    if(groupNums <= 0)
+        return groups;
+    std::vector<DDCChannelGroupHandle> pGroupHandles(groupNums,0);
+    DDC_GetChannelGroups (file, pGroupHandles.data(), groupNums);
+    //转移
+    for(unsigned int i=0;i<pGroupHandles.size ();++i){
         groups.append(pGroupHandles[i]);
     }
     return groups;
@@ -1166,7 +1181,7 @@ DDCFileHandle QTDM::setInStandardItem(tdmFileStruct fileStruct,QStandardItem* it
 			? new QStandardItem(getGroupPropertyByName(*ite,DDC_CHANNELGROUP_NAME))
 			: new QStandardItem(*icoGroup,getGroupPropertyByName(*ite,DDC_CHANNELGROUP_NAME)));
 		//存放组的自身句柄
-		itemGroup->setData(QVariant::fromValue((void*)(*ite)),TREE_ITEM_ROLE_DDC_Handle);	//由于Q_DECLARE_METATYPE(DDCChannelGroup)编译不过，只能通过转换为void*存放
+        itemGroup->setData(QVariant::fromValue(reinterpret_cast<quintptr>(*ite)),TREE_ITEM_ROLE_DDC_Handle);	//由于Q_DECLARE_METATYPE(DDCChannelGroup)编译不过，只能通过转换为void*存放
 		itemGroup->setData(QVariant(DDC_MY_TYPE_GROUP),TREE_ITEM_ROLE_DDC_TYPE);
 		if(isCheckabled)
 		{
@@ -1186,7 +1201,7 @@ DDCFileHandle QTDM::setInStandardItem(tdmFileStruct fileStruct,QStandardItem* it
 				? new QStandardItem(getChannelStringPropertyByName(*ite_c,DDC_CHANNEL_NAME))
 				: new QStandardItem(*icoChannel,getChannelStringPropertyByName(*ite_c,DDC_CHANNEL_NAME)));
 			//存放通道的自身句柄
-			itemChannel->setData(QVariant::fromValue((void*)(*ite_c)),TREE_ITEM_ROLE_DDC_Handle);	//由于Q_DECLARE_METATYPE(DDCChannelGroup)编译不过，只能通过转换为void*存放
+            itemChannel->setData(QVariant::fromValue(reinterpret_cast<quintptr>(*ite_c)),TREE_ITEM_ROLE_DDC_Handle);	//由于Q_DECLARE_METATYPE(DDCChannelGroup)编译不过，只能通过转换为void*存放
 			itemChannel->setData(QVariant(DDC_MY_TYPE_CHANNEL),TREE_ITEM_ROLE_DDC_TYPE);
 			if(isCheckabled)
 				itemChannel->setCheckable(true);
@@ -1300,8 +1315,8 @@ DDCFileHandle QTDM::getStandardItemFileHandle(const QStandardItem* item)
 	if(!var.isValid())
 	{
 		return nullptr;
-	}
-	return DDCFileHandle(var.value<void*>());
+    }
+    return DDCFileHandle(var.value<quintptr>());
 }
 DDCFileHandle QTDM::getStandardItemFileHandle(const QModelIndex item)
 {
@@ -1309,8 +1324,8 @@ DDCFileHandle QTDM::getStandardItemFileHandle(const QModelIndex item)
 	if(!var.isValid())
 	{
 		return nullptr;
-	}
-	return DDCFileHandle(var.value<void*>());
+    }
+    return reinterpret_cast<DDCFileHandle>(var.value<quintptr>());
 }
 DDCChannelGroupHandle QTDM::getStandardItemGroupHandle(const QStandardItem* item)
 {
@@ -1318,8 +1333,8 @@ DDCChannelGroupHandle QTDM::getStandardItemGroupHandle(const QStandardItem* item
 	if(!var.isValid())
 	{
 		return nullptr;
-	}
-	return DDCChannelGroupHandle(var.value<void*>());
+    }
+    return reinterpret_cast<DDCChannelGroupHandle>(var.value<quintptr>());
 }
 DDCChannelGroupHandle QTDM::getStandardItemGroupHandle(const QModelIndex item)
 {
@@ -1327,8 +1342,8 @@ DDCChannelGroupHandle QTDM::getStandardItemGroupHandle(const QModelIndex item)
 	if(!var.isValid())
 	{
 		return nullptr;
-	}
-	return DDCChannelGroupHandle(var.value<void*>());
+    }
+    return reinterpret_cast<DDCChannelGroupHandle>(var.value<quintptr>());
 }
 DDCChannelHandle QTDM::getStandardItemChannelHandle(const QStandardItem* item)
 {
@@ -1336,8 +1351,8 @@ DDCChannelHandle QTDM::getStandardItemChannelHandle(const QStandardItem* item)
 	if(!var.isValid())
 	{
 		return nullptr;
-	}
-	return DDCChannelHandle(var.value<void*>());
+    }
+    return reinterpret_cast<DDCChannelHandle>(var.value<quintptr>());
 }
 DDCChannelHandle QTDM::getStandardItemChannelHandle(const QModelIndex item)
 {
@@ -1346,7 +1361,7 @@ DDCChannelHandle QTDM::getStandardItemChannelHandle(const QModelIndex item)
 	{
 		return nullptr;
 	}
-	return DDCChannelHandle(var.value<void*>());
+    return reinterpret_cast<DDCChannelHandle>(var.value<quintptr>());
 }
 ///
 /// \brief 把数据类型转换为字符串

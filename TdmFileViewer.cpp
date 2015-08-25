@@ -123,10 +123,7 @@ void TdmFileViewer::setTDMSFile(QTDM* tdm)
 			= ui->addTab(tdm->getGroupPropertyByName(gh[i],DDC_CHANNELGROUP_NAME));
 		if(table){
 			TDMFileTableModel* model = new TDMFileTableModel(table);
-			model->setChannelGroupHandle(gh[i]);
-			qDebug()<<tdm->getGroupPropertyByName(gh[i],DDC_CHANNELGROUP_NAME)
-				<<":"
-				<<gh[i];
+			model->setGroupHandle(gh[i]);
 			table->setModel(model);
 		}
 	}
@@ -145,7 +142,7 @@ void TdmFileViewer::setTDMSFile(QTDM* tdm)
 		,&m_publicIconMap[TREE_ITEM_ICON_TdmsChannel]
 	);
 	topItem->setData(QVariant(DDC_MY_TYPE_FILE),TREE_ITEM_ROLE_DDC_TYPE);
-	topItem->setData(QVariant::fromValue((void*)(file)),TREE_ITEM_ROLE_DDC_Handle);
+    topItem->setData(QVariant::fromValue(reinterpret_cast<quintptr>(file)),TREE_ITEM_ROLE_DDC_Handle);
 	model->appendRow(topItem);
 
 }
@@ -157,7 +154,7 @@ void TdmFileViewer::on_treeView_clicked(const QModelIndex &index)
 	if(!var.isValid())
 		return;
 	int type = var.toInt();
-	void* p = nullptr;
+    quintptr p = 0;
 	DDCChannelGroupHandle gH = nullptr;
 	DDCChannelHandle cH = nullptr;
 	switch(type)
@@ -166,17 +163,17 @@ void TdmFileViewer::on_treeView_clicked(const QModelIndex &index)
 		break;
 	case DDC_MY_TYPE_GROUP:
 		{
-			p = index.data(TREE_ITEM_ROLE_DDC_Handle).value<void*>();
-			gH = DDCChannelGroupHandle(p);
+            p = index.data(TREE_ITEM_ROLE_DDC_Handle).value<quintptr>();
+            gH = reinterpret_cast<DDCChannelGroupHandle>(p);
 			activeTab(gH);
 		}
 		break;
 	case DDC_MY_TYPE_CHANNEL:
 		{
-			p = index.data(TREE_ITEM_ROLE_DDC_Handle).value<void*>();
+            p = index.data(TREE_ITEM_ROLE_DDC_Handle).value<quintptr>();
 			cH = DDCChannelHandle(p);
-			void* gp = index.parent().data(TREE_ITEM_ROLE_DDC_Handle).value<void*>();
-			gH = DDCChannelGroupHandle(gp);
+            quintptr gp = index.parent().data(TREE_ITEM_ROLE_DDC_Handle).value<quintptr>();
+            gH = reinterpret_cast<DDCChannelGroupHandle>(gp);
 			activeTab(gH);
 		}
 		break;
